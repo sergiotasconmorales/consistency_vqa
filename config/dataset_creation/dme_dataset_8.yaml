@@ -1,0 +1,23 @@
+# Idrid regions dataset creation
+
+# general options
+path_data: 'data/dme_data_new/dme_odex' # contains images and masks, and each contains train, val, test (pp 59 of notebook)
+path_result: 'data/' # the name of this config file is appended at the end
+format_gt: 'tif'
+macula_filename: 'fovea_center_markups.csv'
+dme_filename: 'dme.csv'
+
+# options for image preparation (preprocessing)
+overwrite_img: False # whether or not to overwrite the processed images
+resize: True
+size: 448
+normalize: True # whether or not to normalize RGB channels
+
+# options for qa generation
+overwrite_qa: True
+num_regions: 50 # number of windows (QA pairs) to be generated for each image
+map_class_suffix: {hard exudate: EX, optic disc: OD} # map from classes for which there is a segmentation to suffixes of mask images
+patience_multiplier: 2
+max_test_grade_0: 11
+question_templates: {inside: are there <> in this region}
+add_q_ex_fovea: True
