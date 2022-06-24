@@ -24,8 +24,6 @@ from core.datasets import loaders_factory
 from core.models import model_factory
 from core.train_vault import criterions, optimizers, train_utils, looper, comet
 
-time.sleep(random.randint(0,30))
-
 # read config name from CLI argument --path_config
 args = io.get_config_file_name()
 
