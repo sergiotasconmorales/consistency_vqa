@@ -1,0 +1,44 @@
+# logging
+comet_ml: True
+experiment_key:
+logs_dir: logs
+
+# dataset info
+dataset: consistency
+path_vocabs: data/VQA2Introspect/processed
+path_qa: data/consistency_data
+
+# text pre-processing
+process_qa_again: False # generate pickle files with processed qa even if they exist already
+num_answers: 2000
+tokenizer: spacy # nltk, re or spacy
+max_question_length: 23 # length of question vectors. For VQA2 longest question has 22 words
+min_word_frequency: 0 # to control size of question word vocab
+
+# training and data-loading-related parameters
+loss: bce # options are crossentropy,
+batch_size: 256
+num_workers: 8
+pin_memory: True
+data_parallel: True
+cuda: True
+learning_rate: 0.001
+optimizer: adam # options are adam, adadelta, rmsprop, sgd
+epochs: 40
+train_from: scratch # whether or not to resume training from some checkpoint. Options are best, last, or scratch
+patience: 12 # patience for the early stopping condition
+metric_to_monitor: 'loss_val' # which metric to monitor to see when to consider change as improvement. eg loss_val, acc_val, auc_val, ap_val
+
+# ********************************************
+# model structure
+# ********************************************
+
+# general
+model: NLPModel
+question_feature_size: 1024 # size of embedded question
+
+# NLP model features
+word_embedding_size: 300
+num_layers_LSTM: 1
+classifier_hidden_size: 2048
+classifier_dropout: 0.25

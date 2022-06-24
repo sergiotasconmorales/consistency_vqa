@@ -1,0 +1,24 @@
+# Idrid regions dataset creation
+
+# general options
+path_data: 'data/coco' # contains images and masks, and each contains train, val, test (pp 59 of notebook)
+path_result: 'data/coco' # the name of this config file is appended at the end
+format_gt: 'tif'
+
+# options for image preparation (preprocessing)
+overwrite_img: False # whether or not to overwrite the processed images
+resize: True
+size: 448
+normalize: True # whether or not to normalize RGB channels
+
+# options for qa generation
+overwrite_qa: False
+num_regions: 10 # number of windows (QA pairs) to be generated for each image
+max_window_side: 85 # with respect to <size> parameter of this file (if resize is True)
+min_window_side: 50 # with respect to <size> parameter of this file (if resize is True)
+proportion_deviation: 0.2 # deviation around one for the windows
+threshold: 10
+window_offset: 2 # offset for the window in the resized space. It determines a region in the borders where the window cannot be
+max_window_size_changes: 12
+map_class_suffix: {airplane: airplane,apple: apple,backpack: backpack,banana: banana,baseball bat: baseballbat,baseball glove: baseballglove,bear: bear,bed: bed,bench: bench,bicycle: bicycle,bird: bird,boat: boat,book: book,bottle: bottle,bowl: bowl,broccoli: broccoli,bus: bus,cake: cake,car: car,carrot: carrot,cat: cat,cellphone: cellphone,chair: chair,clock: clock,couch: couch,cow: cow,cup: cup,dining table: diningtable,dog: dog,donut: donut,elephant: elephant,fire hydrant: firehydrant,fork: fork,frisbee: frisbee,giraffe: giraffe,hair drier: hierdrier,hand bag: handbag,horse: horse,hotdog: hotdog,keyboard: keyboard,kite: kite,knife: knife,laptop: laptop,microwave: microwave,motorcycle: motorcycle,mouse: mouse,orange: orange,oven: oven,parking meter: parkingmeter,person: person,pizza: pizza,potted plant: pottedplant,refrigerator: refrigerator,remote: remote,sandwich: sandwich,scissors: scissors,sheep: sheep,sink: sink,skateboard: skateboard,skis: skis,snowboard: snowboard,spoon: spoon,sports ball: sportsball,stop sign: stopsign,suitcase: suitcase,surfboard: surfboard,teddybear: teddybear,tennis racket: tennisracket,tie: tie,toaster: toaster,toilet: toilet,toothbrush: toothbrush,traffic light: trafficlight,train: train,truck: truck,tv: tv,umbrella: umbrella,vase: vase,wine glass: wineglass,zebra: zebra} # map from classes for which there is a segmentation to suffixes of mask images
+question_templates: {inside: are there <> in this region}
