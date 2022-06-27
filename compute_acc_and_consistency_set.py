@@ -11,11 +11,11 @@ from os.path import join as jp
 from compute_consistency import compute_consistency
 from analyze_val_answers import compute_accuracies
 
-path_configs = 'vqa/config/idrid_regions/single/'
+path_configs = 'config/idrid_regions/single/'
 # now give range for files to be processed
 r_init = 977
 r_end = 986
-path_output = '/home/sergio814/Documents/PhD/code/logs/stats'
+path_output = 'logs/stats'
 q3_too = True
 
 def main():
