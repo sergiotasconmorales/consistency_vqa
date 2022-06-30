@@ -23,7 +23,7 @@ charset-normalizer==2.0.12
 checklist==0.0.11
 cheroot==8.6.0
 CherryPy==18.6.1
-click==8.1.2
+click==7.1.2
 comet-ml==3.24.0
 configobj==5.0.6
 cycler==0.11.0
