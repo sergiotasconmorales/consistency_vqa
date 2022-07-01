@@ -101,10 +101,5 @@ def main():
     print('Question:', question)
     print('Answer:', answer_text)
 
-    # save grade
-    #image_name = path_image.split('/')[-1].split('.')[0]
-    #with open(jp(args.path_output, image_name + '.txt'), 'w') as f:
-    #    f.write(str(answer_text))
-
 if __name__ == '__main__':
     main()

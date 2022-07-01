@@ -105,7 +105,7 @@ class VQARS_1(VQA_Base):
 
 
 class SQuINT(VQARS_1):
-    # SQuINTed version of model 1
+    # SQuINTed version of model 1. See Selvaraju et al. 2020 (CVPR). Re-implemented for comparison purposes, since their code is not open-source.
     def __init__(self, config, vocab_words, vocab_answers):
         super().__init__(config, vocab_words, vocab_answers)
 

@@ -9,15 +9,8 @@
 # IMPORTANT: All configurations are made through the yaml config file which is located in config/<dataset>/<file>.yaml. The path to this file is
 #           specified using CLI arguments, with --path_config <path_to_yaml_file> . If you don't use comet ml, set the parameter comet_ml to False
 
-import os
-import yaml
-from os.path import join as jp
-import comet_ml
-import time
+
 import torch 
-import torch.nn as nn
-import random
-import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import misc.io as io
 from core.datasets import loaders_factory
@@ -31,24 +24,17 @@ def main():
     # read config file
     config = io.read_config(args.path_config)
 
+    # define device as gpu (if available) or cpu
     device = torch.device('cuda' if torch.cuda.is_available() and config['cuda'] else 'cpu')
 
     # load data
     train_loader, vocab_words, vocab_answers, index_unk_answer = loaders_factory.get_vqa_loader('train', config, shuffle=True) 
-
-    # adding to figure out why jobs die in cluster
-    print('Num batches train: ', len(train_loader))
-    print('Num samples train:', len(train_loader.dataset))
-
     val_loader = loaders_factory.get_vqa_loader('val', config) 
-
-    # adding to figure out why jobs die in cluster
-    print('Num batches val: ', len(val_loader))
-    print('Num samples val:', len(val_loader.dataset))
 
     # create model
     model = model_factory.get_vqa_model(config, vocab_words, vocab_answers)
 
+    # load weights for the loss function. The weights are provided in the dataset. See the script compute_answer_weights.py to check how they were computed
     if 'weighted_loss' in config:
         if config['weighted_loss']:
             answer_weights = io.read_weights(config) # if use of weights is required, read them from folder where they were previously saved using compute_answer_weights scripts
@@ -75,21 +61,21 @@ def main():
     # decide which functions are used for training depending on number of possible answers (binary or not)
     train, validate = looper.get_looper_functions(config)
 
-    # Adaptive loss term
+    # Consistency loss term
     consisterm = criterions.ConsistencyLossTerm(config, vocab_words=train_loader.dataset.map_index_word)
 
     # train loop
     for epoch in range(start_epoch, config['epochs']+1):
-        print("Now in epoch", epoch)
+
         # train for one epoch
         train_epoch_metrics = train(train_loader, model, criterion, optimizer, device, epoch, config, logbook, comet_exp=comet_experiment, consistency_term=consisterm)
-        print('Just trained for one epoch')
+
         # log training metrics to comet, if required
         comet.log_metrics(comet_experiment, train_epoch_metrics, epoch)
-        print('Just logged metrics')
+
         # validate for one epoch
         val_epoch_metrics, val_results = validate(val_loader, model, criterion, device, epoch, config, logbook, comet_exp=comet_experiment, consistency_term=consisterm)
-        print('Just did validation for one epoch')
+
         # log val metrics to comet, if required
         comet.log_metrics(comet_experiment, val_epoch_metrics, epoch)
 
