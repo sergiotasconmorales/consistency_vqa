@@ -18,8 +18,6 @@ from PIL import Image
 from misc import general
 from plot import plot_factory
 
-torch.manual_seed(1234) # use same seed for reproducibility
-
 samples_to_show = 10
 desired_q_type = 'inside'
 subsi = 'val' # which subset to analyze. val or test. If test, inference answers (0) have to be available
@@ -82,7 +80,6 @@ def compute_accuracies(config, config_file_name, subsi):
         total_unique_questions += ans_gt.shape[0]
         #print(question_type, "{:.2f}".format(100*acc(ans_pred, ans_gt).item()))
 
-
     accuracies['overall'] = 100*(total_right/total_unique_questions)
     #print('Overall: ', "{:.2f}".format(100*acc(mazamorra[:,0], mazamorra[:,1]).item()))
 
@@ -99,52 +96,5 @@ def main():
 
     print(accuracies)
 
-    """
-    # now visualize some samples
-    cnt = 0 # count error samples
-    sample_type = 'pajarito'
-    while cnt < samples_to_show:
-        while sample_type != desired_q_type:
-            sample = random.choice(qa_pairs_val) # here I have the question, the answer, the image names, the question type and the question id
-            sample_type = sample['question_type']
-        sample_index = int(sample['question_id'])
-        pred_ans_index = get_pred_ans(answers_val_best_epoch, sample_index)
-        pred_ans_text = map_index_answer[pred_ans_index]
-        if sample['answer'] == pred_ans_text:
-            sample_type = 'pajarito'
-            continue  # looking for errors
-        else: # show only errors
-            img = np.array(Image.open(jp(path_images, sample['image_name'])))
-
-            # depending on question type, show something different
-            if sample['question_type'] == 'inside':
-                # open mask
-                mask = np.array(Image.open(jp(path_masks, 'maskA', sample['mask_name'])))
-                print('Question:', sample['question'])
-                print('id:', sample['question_id'], 'image name:', sample['image_name'])
-                print('Ans GT: ' + sample['answer'] + ', ans pred: ' + pred_ans_text)
-                plot_factory.overlay_mask(img, mask, mask, alpha=0.3)
-            elif sample['question_type'] == 'whole':
-                plt.imshow(img)
-                print('Question:', sample['question'])
-                print('id:', sample['question_id'], 'image name:', sample['image_name'])
-                print('Ans GT: ' + sample['answer'] + ', ans pred: ' + pred_ans_text)
-            elif sample['question_type'] == 'grade':
-                # Here simply print
-                print('Question:', sample['question'])
-                print('id:', sample['question_id'], 'image name:', sample['image_name'])
-                print('Ans GT: ' + str(sample['answer']) + ', ans pred: ' + str(pred_ans_text))
-
-            sample_type = 'pajarito'
-            #f, (ax1, ax2) = plt.subplots(1, 2)
-            #st = f.suptitle(sample['question'] + '\n' + 'Ans GT: ' + sample['answer'][0] + ', ans pred: ' + pred_ans_text)
-            #ax1.imshow(img1)
-            #ax2.imshow(img2)
-            #ax1.xaxis.set_visible(False)
-            #ax1.yaxis.set_visible(False)
-            #ax2.xaxis.set_visible(False)
-            #ax2.yaxis.set_visible(False)
-            #cnt += 1
-    """
 if __name__ == '__main__':
     main()

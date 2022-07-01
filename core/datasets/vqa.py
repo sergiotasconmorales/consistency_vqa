@@ -22,6 +22,7 @@ from . import vqa_regions_aux as vqar_helper
 from misc import io
 
 class VQABase(Dataset):
+    """Base class for VQA datasets"""
     def __init__(self, subset, config, dataset_visual):
         self.subset = subset 
         self.config = config
@@ -114,133 +115,10 @@ class VQA2(VQABase):
         for name, data in maps.items():
             io.save_pickle(data, jp(self.path_processed, name + '.pickle'))
 
-class GQAMainSub(VQABase):
-    def __init__(self, subset, config, dataset_visual):
-        super().__init__(subset, config, dataset_visual)
-    
-    def pre_process_qa(self):
-        # method to process qa pairs and save processed files
-        # read csv
-        self.pairs_df = pd.read_csv(jp(self.path_annotations_and_questions, 'qa.csv'))
 
-        # encode answers and questions so that getitem can provide encoded answers and questions.
-        sets, maps = vqa2_helper.process_qa_gqa(self.config, self.pairs_df)
-
-        if not os.path.exists(self.path_processed):
-            os.mkdir(self.path_processed)
-        for name, data in sets.items():
-            io.save_pickle(data, jp(self.path_processed, name + '.pickle'))
-        for name, data in maps.items():
-            io.save_pickle(data, jp(self.path_processed, name + '.pickle'))
-
-    def __getitem__(self, index):
-        samples = [] # a list of dictionaries
-        item = self.dataset_qa[index]
-        samples = [{    'visual': self.dataset_visual.get_by_name(str(item['img_id']) + '.jpg')['visual'],
-                        'question_id': item['mq_id'],
-                        'question': torch.LongTensor(item['mq_word_indexes']),
-                        'answer': item['ma_index'],
-                        #'answers': item['ma_index'],
-                        'flag': 1}, 
-                        {'visual': self.dataset_visual.get_by_name(str(item['img_id']) + '.jpg')['visual'],
-                        'question_id': item['sq_id'],
-                        'question': torch.LongTensor(item['sq_word_indexes']),
-                        'answer': item['sa_index'],
-                        #'answers': item['sa_index'],
-                        'flag': 1}]
-
-        return tuple(samples)
-
-
-    def __len__(self):
-        return len(self.dataset_qa)
-
-class VQA2MainSub(VQA2):
-    """Same as VQA2 but with main-sub pairs in batches
-
-    """
-    def __init__(self, subset, config, dataset_visual):
-        super().__init__(subset, config, dataset_visual)
-
-        if 'augment' in config:
-            self.augment = config['augment']
-        else:
-            self.augment = False
-
-        # here, build pairs of main-and sub-questions using self.dataset_qa
-        self.dataset_qa_pairs = []
-        # list all main questions and all corresponding images
-        main_questions = [e for e in self.dataset_qa if e['role']=='main']
-        if len(main_questions) < 1:
-            raise Exception('For some reason no main questions were detected!')
-        print('Building pairs')
-        for mq in tqdm(main_questions): # iterate through all main questions 
-            main_image = mq['image_name']
-            # get all sub-questions for current main question
-            sub_questions = [e for e in self.dataset_qa if e['image_name'] == main_image and e['role'] == 'sub' and e['parent']==mq['question_id']]
-            assert len(sub_questions) >= 1 # sanity check
-            for sq in sub_questions:
-                self.dataset_qa_pairs.append((mq, sq))
-        # now, append pairs of ind questions
-        ind_questions = [e for e in self.dataset_qa if e['role'] == 'ind']
-        if len(ind_questions)%2 != 0: # if number of ind pairs is not odd, just append last qa pair again
-            ind_questions.append(ind_questions[-1])
-        self.dataset_qa_pairs += [(ind_questions[i], ind_questions[i+1]) for i in range(0,len(ind_questions)-1, 2)]
-
-    # override just to set mainsub to true
-    def pre_process_qa(self):
-        return super().pre_process_qa(mainsub=True)
-
-    # override getitem method
-    def __getitem__(self, index):
-        samples = [] # a list of dictionaries
-
-        # get qa pair
-        for item in self.dataset_qa_pairs[index]:
-            sample = {}
-            # get visual and mask
-            sample['visual'] = self.dataset_visual.get_by_name(item['image_name'])['visual']
-
-            if self.augment:
-                raise NotImplementedError
-
-            # get questions
-            sample['question_id'] = item['question_id']
-            sample['question'] = torch.LongTensor(item['question_word_indexes'])
-
-            # get answers
-            sample['answer'] = item['answer_index']
-            sample['answers'] = item['answers_indexes']
-
-            if item['role'] == 'ind':
-                sample['flag'] = 0
-            else:
-                sample['flag'] = 1
-                
-            samples.append(sample)
-
-        return tuple(samples) # this will return a list of two samples. Collater function in dataloader will have to handle this to build a batch        
-
-    def __len__(self):
-        return len(self.dataset_qa_pairs)
-        
 
 # Regions VQA dataset classes
 
-def draw_borders(img, coords, r=2):
-    # set values to minimum value first
-    img[:, coords[2]-r:coords[0]+r, coords[3]-r: coords[3]+r] = torch.min(img)
-    img[:, coords[2]-r:coords[0]+r, coords[1]-r: coords[1]+r] = torch.min(img)
-    img[:, coords[2]-r: coords[2]+r, coords[3]-r:coords[1]+r] = torch.min(img)
-    img[:, coords[0]-r: coords[0]+r, coords[3]-r:coords[1]+r] = torch.min(img)
-
-    # set red channel line to red
-    img[0, coords[2]-r:coords[0]+r, coords[3]-r: coords[3]+r] = torch.max(img)
-    img[0, coords[2]-r:coords[0]+r, coords[1]-r: coords[1]+r] = torch.max(img)
-    img[0, coords[2]-r: coords[2]+r, coords[3]-r:coords[1]+r] = torch.max(img)
-    img[0, coords[0]-r: coords[0]+r, coords[3]-r:coords[1]+r] = torch.max(img)
-
-    return img
 
 class VQARegionsSingle(VQABase):
     """Class for dataloader that contains questions about a single region
@@ -250,13 +128,12 @@ class VQARegionsSingle(VQABase):
     VQABase : Parent class
         Base class for VQA dataset.
     """
-    def __init__(self, subset, config, dataset_visual, dataset_mask, draw_borders=False):
+    def __init__(self, subset, config, dataset_visual, dataset_mask):
         super().__init__(subset, config, dataset_visual)
         self.dataset_mask = dataset_mask
         if 'augment' not in config:
             config['augment'] = False
         self.augment = config['augment']
-        self.draw_borders = draw_borders
 
 
     def transform(self, image, mask, size):
@@ -301,11 +178,6 @@ class VQARegionsSingle(VQABase):
             sample['visual'] = visual
             sample['maskA'] = mask
 
-        # ! commenting for use in DME dataset        sample['coords'] = item_qa['mask_coords']
-
-        #! same             if self.draw_borders:
-        #!                       sample['visual'] = draw_borders(sample['visual'], sample['coords'])
-
         # get question
         sample['question_id'] = item_qa['question_id']
         sample['question'] = torch.LongTensor(item_qa['question_word_indexes'])
@@ -333,8 +205,8 @@ class VQARegionsSingle(VQABase):
 
 
 class VQA2RegionsSingle(VQARegionsSingle):
-    def __init__(self, subset, config, dataset_visual, dataset_mask, draw_borders=False):
-        super().__init__(subset, config, dataset_visual, dataset_mask, draw_borders=draw_borders)
+    def __init__(self, subset, config, dataset_visual, dataset_mask):
+        super().__init__(subset, config, dataset_visual, dataset_mask)
 
     # override function so that json qa pairs can be processed differently (taking masks into account)
     def pre_process_qa(self):
@@ -365,11 +237,10 @@ class VQA2RegionsSingle(VQARegionsSingle):
 
 
 class VQARegionsSingleMainSub(VQARegionsSingle):
-    """Class for getting samples that contain a main question and a subquestion. Dataset must have been prepared in advance 
-    using modify_dme_main_questions_sub_questions.py
+    """Class for getting samples that contain a main question and a subquestion. Dataset must have been prepared in advance.
     """
-    def __init__(self, subset, config, dataset_visual, dataset_mask, draw_borders=False):
-        super().__init__(subset, config, dataset_visual, dataset_mask, draw_borders)
+    def __init__(self, subset, config, dataset_visual, dataset_mask):
+        super().__init__(subset, config, dataset_visual, dataset_mask)
 
         # here, build pairs of main-and sub-questions using self.dataset_qa
         self.dataset_qa_pairs = []
@@ -426,48 +297,3 @@ class VQARegionsSingleMainSub(VQARegionsSingle):
     def __len__(self):
         return len(self.dataset_qa_pairs)
 
-
-class VQARegionsComplementary(VQABase):
-
-    def __init__(self, subset, config, dataset_visual, dataset_maskA, dataset_maskB):
-        super().__init__(subset, config, dataset_visual)
-        self.dataset_maskA = dataset_maskA
-        self.dataset_maskB = dataset_maskB
-
-    # override getitem method
-    def __getitem__(self, index):
-        sample = {}
-
-        # get qa pair
-        item_qa = self.dataset_qa[index]
-
-        # get visual
-        sample['visual'] = self.dataset_visual.get_by_name(item_qa['image_name'])['visual']
-        sample['maskA'] = self.dataset_maskA.get_by_name(item_qa['maskA_name'])['mask']
-        sample['maskB'] = self.dataset_maskB.get_by_name(item_qa['maskB_name'])['mask']
-
-        # get question
-        sample['question_id'] = item_qa['question_id']
-        sample['question'] = torch.LongTensor(item_qa['question_word_indexes'])
-
-        # get answer
-        sample['answer'] = item_qa['answer_index']
-        sample['coords'] = torch.LongTensor(item_qa['mask_coords'])
-
-        return sample
-
-    # define preprocessing method for qa pairs
-    def pre_process_qa(self):
-        data_train = json.load(open(jp(self.path_annotations_and_questions, 'trainqa.json'), 'r'))
-        data_val = json.load(open(jp(self.path_annotations_and_questions, 'valqa.json'), 'r'))
-        data_test = json.load(open(jp(self.path_annotations_and_questions, 'testqa.json'), 'r'))
-
-        sets, maps = vqa2_helper.process_qa(self.config, data_train, data_val, data_test)
-
-        # define paths to save pickle files
-        if not os.path.exists(self.path_processed):
-            os.mkdir(self.path_processed)
-        for name, data in sets.items():
-            io.save_pickle(data, jp(self.path_processed, name + '.pickle'))
-        for name, data in maps.items():
-            io.save_pickle(data, jp(self.path_processed, name + '.pickle'))

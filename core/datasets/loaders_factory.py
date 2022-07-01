@@ -65,7 +65,8 @@ def get_classif_loader(subset, config, shuffle=False):
 
 
 def get_vqa_loader(subset, config, shuffle=False, draw_borders=False):
-    
+    """Function to get a VQA loader. Creates a visual dataset, then the VQA dataset and then the dataloader"""
+
     # create visual dataset for images
     dataset_visual = visual.get_visual_dataset(subset, config)
 
@@ -123,16 +124,3 @@ def get_visual_loader(subset, config, shuffle=False):
                             )
     return dataloader
 
-def get_nlp_loader(subset, config, shuffle=False):
-    if config['dataset']=='consistency':
-        # here, create dataset instance
-        dataset_nlp = nlp.NLPDataSet(config, subset)
-
-    dataloader = DataLoader( dataset_nlp,
-                                batch_size = config['batch_size'],
-                                shuffle=shuffle,
-                                num_workers=config['num_workers'],
-                                pin_memory=True,
-                            )
-
-    return dataloader

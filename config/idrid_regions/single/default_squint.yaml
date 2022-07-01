@@ -12,7 +12,7 @@ augment: True
 mainsub: True
 lambda: 1.0
 squint: True
-consistency_function: fcn2
+consistency_function: fcn2 # irrelevant in this case because squint is set to True 
 gamma: 0.5
 exp: False
 

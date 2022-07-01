@@ -19,15 +19,6 @@ from core.datasets import loaders_factory
 from core.models import model_factory
 from core.train_vault import criterions, optimizers, train_utils, looper, comet
 
-""" 
-torch.manual_seed(1234) # use same seed for reproducibility
-torch.manual_seed(1234) 
-torch.cuda.manual_seed(1234)
-random.seed(1234)
-np.random.seed(1234)
-torch.backends.cudnn.deterministic=True
-torch.backends.cudnn.benchmark=False
-"""
 
 # read config name from CLI argument --path_config
 args = io.get_config_file_name()

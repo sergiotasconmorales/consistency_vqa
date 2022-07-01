@@ -43,7 +43,7 @@ Example:
 
 After training, the `logs` folder, as defined in the YAML file, will contain the results of the training. This includes the model weights for the best and last epoch, as well as the answers produced by the model for each epoch. Additionally, a JSON file named `logbook` will be generated, which contains the information from the config file and the values of the metrics (loss and performance) for each epoch.
 
-## Inference
+## Inference for test set
 In order to do inference on the test set, use the following command:
 
     inference.py --path_config <path_config>
@@ -64,6 +64,12 @@ The inference results are stored in the `logs` folder, as defined in the config 
 </p>
 
 Each of these files contains a matrix with two columns, the first one representing the question ID, and the second one corresponding to the answer provided by the model. The answer is an integer. To convert from integer to the textual answer, a dictionary is given in `<path_data>/processed/map_index_answer.pickle`
+
+## Inference for a single sample
+The following command allows you to do inference on a single sample using a previously trained model (as specified by the config file in `<path_config>`):
+
+    inference_single.py --path_config <path_config> --path_image <path_image> --path_mask <path_mask> --question <question>
+
 
 
 ## Plotting metrics and learning curves

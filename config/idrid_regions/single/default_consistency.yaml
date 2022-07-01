@@ -11,7 +11,7 @@ path_masks: data/dme_dataset_8_balanced/masks
 augment: True
 mainsub: True
 lambda: 0.5
-consistency_function: fcn2
+consistency_function: fcn2 # fcn2 (our method) or fcn4 (baseline)
 gamma: 1.0
 exp: False
 
