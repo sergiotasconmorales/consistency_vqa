@@ -64,7 +64,7 @@ def get_classif_loader(subset, config, shuffle=False):
 
 
 
-def get_vqa_loader(subset, config, shuffle=False, draw_borders=False):
+def get_vqa_loader(subset, config, shuffle=False):
     """Function to get a VQA loader. Creates a visual dataset, then the VQA dataset and then the dataloader"""
 
     # create visual dataset for images
@@ -80,11 +80,11 @@ def get_vqa_loader(subset, config, shuffle=False, draw_borders=False):
     elif 'idrid_regions_single' in config['dataset'] or 'vqa2_regions_single' in config['dataset']:
         dataset_mask = visual.get_mask_dataset(subset, config, 'maskA')
         if config['mainsub'] and subset != 'test': # if main and sub-questions, use corresponding dataset class
-            dataset_vqa = vqa.VQARegionsSingleMainSub(subset, config, dataset_visual, dataset_mask, draw_borders=draw_borders)
+            dataset_vqa = vqa.VQARegionsSingleMainSub(subset, config, dataset_visual, dataset_mask)
         elif config['dataset']=='vqa2_regions_single':
-            dataset_vqa = vqa.VQA2RegionsSingle(subset, config, dataset_visual, dataset_mask, draw_borders=draw_borders)
+            dataset_vqa = vqa.VQA2RegionsSingle(subset, config, dataset_visual, dataset_mask)
         else:
-            dataset_vqa = vqa.VQARegionsSingle(subset, config, dataset_visual, dataset_mask, draw_borders=draw_borders)
+            dataset_vqa = vqa.VQARegionsSingle(subset, config, dataset_visual, dataset_mask)
     elif 'idrid_regions_complementary' in config['dataset']:
         dataset_maskA = visual.get_mask_dataset(subset, config, 'maskA')
         dataset_maskB = visual.get_mask_dataset(subset, config, 'maskB')
