@@ -1,14 +1,14 @@
 # Consistency-preserving Visual Question Answering in Medical Imaging
 This is the official repository of the paper "Consistency-preserving Visual Question Answering in Medical Imaging," published in the proceedings of the MICCAI2022.
 
-Our method consists of a loss function and corresponding training method to improve the consistency. Evaluated on a medical dataset, we achieve improvements both in consistency and accuracy. For more details, please refer to our [paper](/).
+Our method consists of a loss function and corresponding training method to improve the consistency. Evaluated on a medical dataset, we achieve improvements both in consistency and accuracy. For more details, please refer to our [paper](https://arxiv.org/abs/2206.13296).
 
 <p align="center">
 <img src="./assets/method.png" alt="method" width="500"/>
 </p>
 
 ## Data
-You can download our DME dataset from [here](https://zenodo.org/record/6784358). You can place the zip file in any location and then unzip it. We'll refer to the path to the unzipped folder as `<path_data>`. A more detailed description of the dataset can be found [here](consistency_vqa/blob/master/DATA.md).
+You can download our DME dataset from [here](https://zenodo.org/record/6784358). You can place the zip file in any location and then unzip it. We'll refer to the path to the unzipped folder as `<path_data>`. A more detailed description of the dataset can be found [here](DATA.md).
 
 
 ## Installing Requirements
