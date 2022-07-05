@@ -8,10 +8,11 @@ Our method consists of a loss function and corresponding training method to impr
 </p>
 
 ## Data
-You can download our DME dataset from [here](https://zenodo.org/record/6784358). You can place the zip file in any location and then unzip it. We'll refer to the path to the unzipped folder as `<path_data>`.
+You can download our DME dataset from [here](https://zenodo.org/record/6784358). You can place the zip file in any location and then unzip it. We'll refer to the path to the unzipped folder as `<path_data>`. A more detailed description of the dataset can be found [here](consistency_vqa/blob/master/DATA.md).
+
 
 ## Installing Requirements
-Create a new environment with Python 3.9, activate it, and then install the required packages by running:
+After cloning the repo, create a new environment with Python 3.9, activate it, and then install the required packages by running:
 
     pip install -r requirements.txt
 
