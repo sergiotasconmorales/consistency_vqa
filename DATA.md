@@ -78,4 +78,11 @@ As it can be observed from the previous tables, the number of QA pairs is much h
 
 This work was carried out at the [AIMI Lab](https://www.artorg.unibe.ch/research/aimi/index_eng.html) of the [ARTORG Center for Biomedical Engineering Research](https://www.artorg.unibe.ch) of the [University of Bern](https://www.unibe.ch/index_eng.html). Please cite this work as:
 
-> Citation pending
+> @inproceedings{tascon2022consistency,
+  title={Consistency-Preserving Visual Question Answering in Medical Imaging},
+  author={Tascon-Morales, Sergio and Márquez-Neila, Pablo and Sznitman, Raphael},
+  booktitle={International Conference on Medical Image Computing and Computer-Assisted Intervention},
+  pages={386--395},
+  year={2022},
+  organization={Springer}
+}
